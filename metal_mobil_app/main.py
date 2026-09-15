@@ -1,75 +1,74 @@
 import streamlit as st
 import time
 
-# Eğer projenizde custom fonksiyonlar varsa onların hata vermemesi için importlar
-try:
-    import constants
-    import interface
-except ImportError:
-    pass
+# --- MODÜLLERİ ÇAĞIRMA ---
+import constants
+import interface
 
-# Sayfa Yapılandırması
+# --- IPHONE TAM EKRAN (PWA) VE MOBİL GÖRÜNÜM AYARLARI ---
 st.set_page_config(
     page_title="Metal Hesaplama",
     page_icon="⚙️",
     layout="centered"
 )
 
-# --- GOOGLE ADMOB REKLAM ALTYAPISI ---
-# Not: İleride mağazaya çıkarken buradaki TEST kimliklerini gerçek AdMob kimliklerinizle değiştireceğiz.
-ADMOB_APP_ID = "ca-app-pub-3940256099942544~3347511713"  # Google Test App ID
-ADMOB_REWARDED_ID = "ca-app-pub-3940256099942544/5224354917"  # Google Test Ödüllü Reklam ID
-
-# Session State (Hak Takibi) Başlatma
-if "kalan_hak" not in st.session_state:
-    st.session_state.kalan_hak = 3  # Günlük 3 ücretsiz hak
-
-# Uygulama Başlığı
-st.title("⚙️ Metal Hesaplama Uygulaması")
-st.write(f"📊 **Kalan Ücretsiz İşlem Hakkınız:** `{st.session_state.kalan_hak}`")
-
-# --- HAK KONTROLÜ VE UYGULAMA MANTIĞI ---
-if st.session_state.kalan_hak > 0:
-    st.info("Hesaplama formunuz aşağıdadır. Her hesaplama işleminde 1 hakkınız düşer.")
-    
-    # Örnek Hesaplama Butonu (Sizin kendi hesaplama formunuz buraya gelecek)
-    if st.button("🧮 Hesapla"):
-        with st.spinner("Hesaplanıyor..."):
-            time.sleep(1)
-        st.session_state.kalan_hak -= 1
-        st.session_state.son_sonuc = "Hesaplama Başarıyla Tamamlandı!"
-        st.success(st.session_state.son_sonuc)
-        st.rerun()
-
-else:
-    st.warning("⚠️ Günlük ücretsiz işlem hakkınız bitmiştir! Devam etmek için reklam izleyerek +10 hak kazanabilirsiniz.")
-
-st.write("---")
-
-# --- REKLAM İZLEME VE ÖDÜL BUTONU ---
-# CSS ile butonun nabız gibi büyümesini sağlayan görsel efekt (Fotoğrafınızdaki stil)
+# iPhone'da tarayıcı çubuklarını gizleyen ve uygulamayı tam ekran yapan Apple Meta Etiketleri
 st.markdown(
     """
+    <head>
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    </head>
     <style>
+    /* Reklam butonunun nabız gibi büyümesini sağlayan efekt */
     @keyframes pulse {
         0% { transform: scale(1); }
         50% { transform: scale(1.03); }
         100% { transform: scale(1); }
     }
-    div.stButton > button:first-child {
-        animation: pulse 2s infinite;
-        background-color: #ff4b4b;
-        color: white;
-        font-weight: bold;
+    div.stButton > button:contains("REKLAM İZLE") {
+        animation: pulse 2s infinite !important;
+        background-color: #ff4b4b !important;
+        color: white !important;
+        font-weight: bold !important;
     }
     </style>
     """,
     unsafe_allow_html=True
 )
 
+# --- GOOGLE ADMOB REKLAM ALTYAPISI ---
+ADMOB_REWARDED_ID = "ca-app-pub-3940256099942544/5224354917"  # Test Ödüllü Reklam ID
+
+# Session State (Hak Takibi) Başlatma
+if "kalan_hak" not in st.session_state:
+    st.session_state.kalan_hak = 3  # Günlük 3 ücretsiz hak
+
+# --- ARYÜZ BAŞLIĞI VE HAK GÖSTERGESİ ---
+st.title("⚙️ Metal Hesaplama Uygulaması")
+st.write(f"📊 **Kalan Ücretsiz İşlem Hakkınız:** `{st.session_state.kalan_hak}`")
+
+# --- ANA UYGULAMA MANTIĞI ---
+if st.session_state.kalan_hak > 0:
+    # Sizin esas metal formlarınızı ve menülerinizi içeren dosyayı buraya çağırıyoruz
+    try:
+        interface.main()  # Eğer hata verirse bir sonraki adımda düzelteceğiz
+    except AttributeError:
+        try:
+            interface.show_interface()
+        except Exception as e:
+            st.error(f"Arayüz yüklenirken bir hata oluştu: {e}")
+            st.info("Formlar yüklenemedi ancak hak sisteminiz aktif.")
+            
+else:
+    st.warning("⚠️ Günlük ücretsiz işlem hakkınız bitmiştir! Devam etmek için reklam izleyerek +10 hak kazanabilirsiniz.")
+
+st.write("---")
+
+# --- REKLAM İZLEME VE ÖDÜL BUTONU ---
 if st.button("🎬 REKLAM İZLE (+10 HAK KAZAN)"):
     with st.spinner("Reklam yükleniyor... (10 Saniye)"):
-        # İleride iPhone uygulaması içine gömdüğümüzde gerçek AdMob reklamını tetikleyecek görünmez JavaScript kodu
         st.components.v1.html(
             f"""
             <script>
@@ -85,11 +84,7 @@ if st.button("🎬 REKLAM İZLE (+10 HAK KAZAN)"):
         )
         time.sleep(10)  # Reklam izleme simülasyon süresi
         
-    # Ödül tanımlama işlemleri
     st.session_state.kalan_hak += 10
-    if "son_sonuc" in st.session_state:
-        del st.session_state.son_sonuc  # Eski sonucu temizle
-        
     st.success("🎉 Tebrikler! Reklamı başarıyla izlediniz. Hesabınıza +10 Hak Eklendi!")
     time.sleep(1)
     st.rerun()
