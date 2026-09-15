@@ -3,8 +3,7 @@ import time
 import sys
 import os
 
-# --- KLASÖR YOLU DÜZELTMESİ (HATA ÇÖZÜMÜ) ---
-# main.py dosyasının bir üst klasöründeki constants ve interface dosyalarını bulmasını sağlar
+# --- KLASÖR YOLU DÜZELTMESİ ---
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # --- MODÜLLERİ ÇAĞIRMA ---
@@ -18,7 +17,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# iPhone'da tarayıcı çubuklarını gizleyen ve uygulamayı tam ekran yapan Apple Meta Etiketleri
+# iPhone'da tarayıcı çubuklarını gizleyen Apple Meta Etiketleri ve Reklam Butonu Efekti
 st.markdown(
     """
     <head>
@@ -27,13 +26,13 @@ st.markdown(
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     </head>
     <style>
-    /* Reklam butonunun nabız gibi büyümesini sağlayan efekt */
     @keyframes pulse {
         0% { transform: scale(1); }
         50% { transform: scale(1.03); }
         100% { transform: scale(1); }
     }
-    div.stButton > button {
+    /* Reklam izle butonunu özelleştirme ve hareketlendirme */
+    div.stButton > button:contains("REKLAM İZLE") {
         animation: pulse 2s infinite !important;
         background-color: #ff4b4b !important;
         color: white !important;
@@ -51,28 +50,34 @@ ADMOB_REWARDED_ID = "ca-app-pub-3940256099942544/5224354917"  # Test Ödüllü R
 if "kalan_hak" not in st.session_state:
     st.session_state.kalan_hak = 3  # Günlük 3 ücretsiz hak
 
-# --- ARYÜZ BAŞLIĞI VE HAK GÖSTERGESİ ---
+# --- ANA BAŞLIK VE HAK GÖSTERGESİ ---
 st.title("⚙️ Metal Hesaplama Uygulaması")
 st.write(f"📊 **Kalan Ücretsiz İşlem Hakkınız:** `{st.session_state.kalan_hak}`")
+st.write("---")
 
 # --- ANA UYGULAMA MANTIĞI ---
 if st.session_state.kalan_hak > 0:
-    # Sizin esas metal formlarınızı ve menülerinizi içeren dosyayı buraya çağırıyoruz
+    # Sizin birinci fotoğraftaki asıl formlarınızı ve menülerinizi ekrana çağırıyoruz
     try:
-        interface.main()  
-    except AttributeError:
-        try:
+        # interface.py içindeki tüm fonksiyonları otomatik deneyerek doğru olanı çalıştırır
+        if hasattr(interface, 'interface_mobil_tasarim'):
+            interface.interface_mobil_tasarim()
+        elif hasattr(interface, 'main'):
+            interface.main()
+        elif hasattr(interface, 'show_interface'):
             interface.show_interface()
-        except Exception as e:
-            st.error(f"Arayüz yüklenirken bir hata oluştu: {e}")
-            st.info("Formlar yüklenemedi ancak hak sisteminiz aktif.")
+        else:
+            # Eğer yukarıdakiler dışında bir isimse interface dosyasını doğrudan çalıştırır
+            interface.render()
+    except Exception as e:
+        st.error(f"Arayüz formları yüklenirken bir sorun oluştu: {e}")
             
 else:
-    st.warning("⚠️ Günlük ücretsiz işlem hakkınız bitmiştir! Devam etmek için reklam izleyerek +10 hak kazanabilirsiniz.")
+    st.warning("⚠️ Günlük ücretsiz işlem hakkınız bitmiştir! Devam etmek için aşağıdan reklam izleyerek +10 hak kazanabilirsiniz.")
 
 st.write("---")
 
-# --- REKLAM İZLEME VE ÖDÜL BUTONU ---
+# --- REKLAM İZLEME VE ÖDÜL BUTONU (ALT SAYFA) ---
 if st.button("🎬 REKLAM İZLE (+10 HAK KAZAN)"):
     with st.spinner("Reklam yükleniyor... (10 Saniye)"):
         st.components.v1.html(
