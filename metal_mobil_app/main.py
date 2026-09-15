@@ -1,5 +1,11 @@
 import streamlit as st
 import time
+import sys
+import os
+
+# --- KLASÖR YOLU DÜZELTMESİ (HATA ÇÖZÜMÜ) ---
+# main.py dosyasının bir üst klasöründeki constants ve interface dosyalarını bulmasını sağlar
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # --- MODÜLLERİ ÇAĞIRMA ---
 import constants
@@ -27,7 +33,7 @@ st.markdown(
         50% { transform: scale(1.03); }
         100% { transform: scale(1); }
     }
-    div.stButton > button:contains("REKLAM İZLE") {
+    div.stButton > button {
         animation: pulse 2s infinite !important;
         background-color: #ff4b4b !important;
         color: white !important;
@@ -53,7 +59,7 @@ st.write(f"📊 **Kalan Ücretsiz İşlem Hakkınız:** `{st.session_state.kalan
 if st.session_state.kalan_hak > 0:
     # Sizin esas metal formlarınızı ve menülerinizi içeren dosyayı buraya çağırıyoruz
     try:
-        interface.main()  # Eğer hata verirse bir sonraki adımda düzelteceğiz
+        interface.main()  
     except AttributeError:
         try:
             interface.show_interface()
