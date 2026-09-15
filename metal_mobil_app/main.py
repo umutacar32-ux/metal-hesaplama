@@ -2,16 +2,11 @@ import streamlit as st
 import math
 import time
 
-# --- MOBİL GÖRÜNÜM VE TAM EKRAN (PWA) AYARLARI ---
+# --- MOBİL GÖRÜNÜM VE SAYFA AYARLARI ---
 st.set_page_config(page_title="Metal Ağırlık Hesaplama", page_icon="⚙️", layout="centered")
 
-# Şık Koyu Tema, Hesaplama Kutusu ve Nabız Efektli Reklam Butonu Tasarımı (CSS)
+# Şık Tasarım, Hesaplama Kutusu ve Buton Özelleştirmeleri (CSS)
 st.markdown("""
-    <head>
-        <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    </head>
     <style>
     .main { background-color: #1E1E24; }
     
@@ -43,14 +38,9 @@ st.markdown("""
         50% { transform: scale(1.03); }
         100% { transform: scale(1); }
     }
-    div.stButton > button:contains("REKLAM İZLE") {
-        animation: pulse 2s infinite !important;
-        background-color: #ff4b4b !important;
-        color: white !important;
-        font-weight: bold !important;
-        font-size: 18px !important;
-        height: 3em !important;
-        width: 100% !important;
+    
+    /* Streamlit içindeki tüm butonların genel düzeni */
+    div.stButton > button {
         border-radius: 10px !important;
     }
     </style>
@@ -210,7 +200,6 @@ st.write("---")
 # --- REKLAM İZLEME VE ÖDÜL ALANI ---
 if st.button("🎬 REKLAM İZLE (+10 HAK KAZAN)"):
     with st.spinner("Reklam yükleniyor ve oynatılıyor... (10 Saniye)"):
-        # Yarın mobil sarmalayıcıya (Wrapper) girdiğinde gerçek reklamı çağıracak JS kodu
         st.components.v1.html(
             f"""
             <script>
