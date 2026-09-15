@@ -32,7 +32,7 @@ st.markdown(
         100% { transform: scale(1); }
     }
     /* Reklam izle butonunu özelleştirme ve hareketlendirme */
-    div.stButton > button:contains("REKLAM İZLE") {
+    div.stButton > button {
         animation: pulse 2s infinite !important;
         background-color: #ff4b4b !important;
         color: white !important;
@@ -57,18 +57,9 @@ st.write("---")
 
 # --- ANA UYGULAMA MANTIĞI ---
 if st.session_state.kalan_hak > 0:
-    # Sizin birinci fotoğraftaki asıl formlarınızı ve menülerinizi ekrana çağırıyoruz
+    # Bulduğumuz asıl arayüz fonksiyonunu tetikliyoruz
     try:
-        # interface.py içindeki tüm fonksiyonları otomatik deneyerek doğru olanı çalıştırır
-        if hasattr(interface, 'interface_mobil_tasarim'):
-            interface.interface_mobil_tasarim()
-        elif hasattr(interface, 'main'):
-            interface.main()
-        elif hasattr(interface, 'show_interface'):
-            interface.show_interface()
-        else:
-            # Eğer yukarıdakiler dışında bir isimse interface dosyasını doğrudan çalıştırır
-            interface.render()
+        interface.profil_tipi()
     except Exception as e:
         st.error(f"Arayüz formları yüklenirken bir sorun oluştu: {e}")
             
